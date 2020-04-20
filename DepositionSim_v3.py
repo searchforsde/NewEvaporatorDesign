@@ -18,7 +18,7 @@ width = 100 # x dimension
 length = 1000 # y dimension
 
 # height above the nozzle tip
-height = 50
+height = 100
 
 # resolve down to "pixels" of this dimension on the substrate
 resolution = 0.1
