@@ -11,7 +11,7 @@ import matplotlib.image as mpimg
 
 # total flux is the integral of c*cos(theta)**n over the hemisphere of emission
 c = 1
-n = 1
+n = 2
 
 # dimensions of the rectangular substrate
 width = 100 # x dimension
@@ -56,7 +56,7 @@ sub_y = np.flip(sub_y) + rectangle_centroid[1] - np.mean(sub_y) # correct the or
 sub_y = np.repeat(np.expand_dims(sub_y, 1), pixelsnumber_width, axis = 1) # expand into an array
 
 # every pixel's distance from the nozzle
-dist_array = (sub_x - nozzle_start[0]) ** 2 + (sub_y - nozzle_start[1]) ** 2 + height ** 2 
+dist_array = np.sqrt((sub_x - nozzle_start[0]) ** 2 + (sub_y - nozzle_start[1]) ** 2 + height ** 2)
 
 # cos(theta) from the nozzle midline to each pixel
 cos__array = np.divide(height, dist_array)
@@ -66,10 +66,10 @@ dxy = (nozzle_final - nozzle_start) * dt/t_span
 t = 0 # set starting time
 while t <= t_span:
     # add deposition to each pixel
-    sub_deposition = sub_deposition + np.divide(dt * c * cos__array ** (n + 1), dist_array ** 2) 
+    sub_deposition = sub_deposition + np.divide(dt * c * cos__array ** n, dist_array ** 2) 
     t += dt # increment the time
     nozzle_start += dxy # change in nozzle position
-    dist_array = (sub_x - nozzle_start[0])** 2 + (sub_y - nozzle_start[1])** 2 + height ** 2 # update distances from nozzle
+    dist_array = np.sqrt((sub_x - nozzle_start[0])** 2 + (sub_y - nozzle_start[1])** 2 + height ** 2) # update distances from nozzle
     cos__array = np.divide(height, dist_array) # update cos(theta) from nozzle midline
     
 sub_deposition = sub_deposition / np.nanmax(sub_deposition) * 100
@@ -79,6 +79,6 @@ x_max = rectangle_centroid[0] + width/2
 y_min = rectangle_centroid[1] - length/2
 y_max = rectangle_centroid[1] + length/2
 
-fig, ax = plt.subplots()
+fig, (ax1, ax2) = plt.subplots(1, 2)
 ax1 = plt.imshow(sub_deposition, cmap='magma', extent = [x_min, x_max, y_min, y_max]) # starter plot. Needs to be scaled and labeled.
 cbar = fig.colorbar(ax1)
